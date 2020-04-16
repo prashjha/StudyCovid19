@@ -1,9 +1,6 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[1]:
-
-
 # dependencies
 import os
 import numpy as np
@@ -21,8 +18,9 @@ sns.set_style("whitegrid")
 sns.set_context("notebook", font_scale=3, rc={"lines.linewidth": 3})
 # mpl.rcParams['lines.linewidth'] = 3
 
-# In[3]:
-
+##
+## Methods for [datasets/covid-19](https://github.com/datasets/covid-19)
+##
 
 # list confirmed cases of one country
 def get_country_data_1(df, country):
@@ -163,6 +161,43 @@ def plot_countries_all_normalize_1(df, countries):
     plt.show() 
     
     
+def plot_countries_all_plus_normalize_1(df, countries):
+    
+    n = len(countries)
+    
+    sns.set_context("notebook", font_scale=2, rc={"lines.linewidth": 3})
+    
+    fig = plt.figure(figsize=(30., 10.))
+    axes = fig.subplots(nrows=1, ncols=2)
+    
+    for i in range(n):
+        
+        a,b,c,d = get_confirmed_1(df, countries[i])
+        if i == 0:
+            print('Num days: {}'.format(c[-1] + 1))
+        
+        # plot unnormalized first
+        axes[0].plot(c, b, label='Country: {}, Start date: {}'.format(countries[i], d))
+        axes[0].set_title('Confirmed cases for different countries')                            
+        axes[0].set_xlabel('Day')
+        axes[0].set_ylabel('Confirmed cases')
+        axes[0].legend(prop={'size': 15})
+        
+        # plot normalized now
+        
+        scale = np.max(b)
+        b = np.true_divide(b, scale)
+        
+        axes[1].plot(c, b, label='Country: {}, Start date: {}'.format(countries[i], d))
+        axes[1].set_title('Normalized confirmed cases for different countries')                            
+        axes[1].set_xlabel('Day')
+        axes[1].set_ylabel('Normalized confirmed cases')
+        axes[1].legend(prop={'size': 15})
+        
+        
+    plt.show() 
+    
+    
 def save_country_data_1(df, countries):
     
     n = len(countries)
@@ -178,3 +213,49 @@ def save_country_data_1(df, countries):
             inpf.write('{}, {}\n'.format(c[j], b[j]))
         
         inpf.close()
+
+        
+##
+## Methods for [CSSEGISandData/COVID-19](https://github.com/CSSEGISandData/COVID-19)
+##
+
+Nrows = 264
+Ncols = 88
+
+def find_row_2(df, country):
+    for i in range(Nrows):
+        a = df.iloc[i][1]
+        
+        if a == country:
+            
+            return i
+        
+def get_array_2(d):
+    a = []
+    for i in range(Ncols-2):
+        a.append(int(d[i+2]))
+        
+    return np.array(a)
+
+
+# plot data
+def plot_countries_all_2(df, countries):
+    
+    n = len(countries)
+    fig = plt.figure(figsize=(20., 20.))
+    
+    for i in range(n):
+        
+        a = df.iloc[find_row_2(df, countries[i])]
+        b = get_array_2(a)
+        
+        plt.plot(b, label='Country: {}'.format(countries[i]))
+        
+        plt.title('Confirmed cases for different countries')                            
+        plt.xlabel('Day')
+        plt.ylabel('Confirmed cases')
+        
+        plt.legend(prop={'size': 40})
+        
+        
+    plt.show() 
